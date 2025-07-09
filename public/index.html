@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Last Player Standing</title>
+  <script src="/socket.io/socket.io.js"></script>
+  <script defer src="client.js"></script>
+</head>
+<body>
+  <h2>Join a Room</h2>
+  <input id="roomId" placeholder="Room ID">
+  <input id="name" placeholder="Your Name">
+  <button onclick="join()">Join</button>
+  <div id="players"></div>
+  <button onclick="start()">Start Game</button>
+  <div id="status"></div>
+</body>
+</html>
