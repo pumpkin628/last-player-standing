@@ -30,15 +30,20 @@ app.post('/api/create-room', (req, res) => {
 
 io.on('connection', socket => {
   socket.on('joinRoom', ({ roomId, playerName }) => {
-    const room = rooms.get(roomId);
-    if (!room || room.started || room.players.find(p => p.name === playerName)) return;
+  const room = rooms.get(roomId);
+  if (!room || room.started) return;
 
-    socket.join(roomId);
-    socket.data.roomId = roomId;
-    socket.data.playerName = playerName;
+  // Add the player if not already present
+  if (!room.players.find(p => p.name === playerName)) {
+    room.players.push({ name: playerName, eliminated: false });
+  }
 
-    io.to(roomId).emit('playerList', room.players);
-  });
+  socket.join(roomId);
+  socket.data.roomId = roomId;
+  socket.data.playerName = playerName;
+
+  io.to(roomId).emit('playerList', room.players);
+});
 
   socket.on('startGame', async () => {
     const roomId = socket.data.roomId;
