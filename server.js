@@ -33,16 +33,16 @@ io.on('connection', socket => {
 
   socket.on('joinRoom', ({ roomId, playerName }) => {
   const room = rooms.get(roomId);
-  // if (!room || room.started) return;
-  if (!room) {
-    room = {
-      players: [],
-      started: false,
-      callbackUrl: ""
-    };
-    rooms.set(roomId, room);
-  }
-  if (room.started) return;
+  if (!room || room.started) return;
+  // if (!room) {
+  //   room = {
+  //     players: [],
+  //     started: false,
+  //     callbackUrl: ""
+  //   };
+  //   rooms.set(roomId, room);
+  // }
+  // if (room.started) return;
 
   // Add the player if not already present
   if (!room.players.find(p => p.name === playerName)) {
