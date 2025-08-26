@@ -32,27 +32,34 @@ io.on('connection', socket => {
 
 
   socket.on('joinRoom', ({ roomId, playerName }) => {
-  const room = rooms.get(roomId);
-  if (!room || room.started) return;
-  // if (!room) {
-  //   room = {
-  //     players: [],
-  //     started: false,
-  //     callbackUrl: ""
-  //   };
-  //   rooms.set(roomId, room);
-  // }
-  // if (room.started) return;
+ let room = rooms.get(roomId);
 
-  // Add the player if not already present
-  if (!room.players.find(p => p.name === playerName)) {
-    room.players.push({ name: playerName, eliminated: false });
+  // ✅ Auto-create the room if it doesn't exist
+  if (!room) {
+    room = {
+      players: [],
+      started: false,
+      callbackUrl: ""
+    };
+    rooms.set(roomId, room);
+    console.log(`[AUTO-CREATED] Room ${roomId}`);
   }
 
+  // If the game already started, block late joins
+  if (room.started) return;
+
+  // ✅ Add the player if not already in the list
+  if (!room.players.find(p => p.name === playerName)) {
+    room.players.push({ name: playerName, eliminated: false });
+    console.log(`[JOINED] ${playerName} joined room ${roomId}`);
+  }
+
+  // Join the WebSocket room
   socket.join(roomId);
   socket.data.roomId = roomId;
   socket.data.playerName = playerName;
 
+  // Notify everyone in the room of the updated list
   io.to(roomId).emit('playerList', room.players);
 });
 
