@@ -1,5 +1,5 @@
 const cors = require('cors');
-app.use(cors());
+
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -12,7 +12,7 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 app.use(bodyParser.json());
-
+app.use(cors());
 const rooms = new Map(); // roomId → { players, started, callbackUrl }
 
 app.post('/api/create-room', (req, res) => {
