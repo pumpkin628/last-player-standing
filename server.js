@@ -27,6 +27,37 @@ app.post('/api/create-room', (req, res) => {
 
   res.json({ message: 'Room created', roomId });
 });
+app.post('/api/join-room', (req, res) => {
+  const { roomId, playerName } = req.body;
+
+  if (!roomId || !playerName) {
+    return res.status(400).json({ error: 'Missing roomId or playerName' });
+  }
+
+  const room = rooms.get(roomId);
+  if (!room) {
+    return res.status(404).json({ error: 'Room not found' });
+  }
+
+  if (room.started) {
+    return res.status(400).json({ error: 'Game already started' });
+  }
+
+  // Add player if not present
+  if (!room.players.find(p => p.name === playerName)) {
+    room.players.push({ name: playerName, eliminated: false });
+  }
+
+  // Notify everyone in the room via Socket.IO
+  io.to(roomId).emit('playerList', room.players);
+
+  res.json({
+    message: 'Joined successfully',
+    roomId,
+    players: room.players
+  });
+});
+
 
 io.on('connection', socket => {
 
