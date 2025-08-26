@@ -1,3 +1,5 @@
+const cors = require('cors');
+app.use(cors());
 const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
@@ -34,7 +36,7 @@ app.post('/api/join-room', (req, res) => {
     return res.status(400).json({ error: 'Missing roomId or playerName' });
   }
 
-  const room = rooms.get(roomId);
+  let room = rooms.get(roomId);
   if (!room) {
     return res.status(404).json({ error: 'Room not found' });
   }
@@ -48,7 +50,7 @@ app.post('/api/join-room', (req, res) => {
     room.players.push({ name: playerName, eliminated: false });
   }
 
-  // Notify everyone in the room via Socket.IO
+  // ✅ Emit updated player list to WebSocket clients in the room
   io.to(roomId).emit('playerList', room.players);
 
   res.json({
@@ -57,6 +59,7 @@ app.post('/api/join-room', (req, res) => {
     players: room.players
   });
 });
+
 
 
 io.on('connection', socket => {
